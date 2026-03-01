@@ -1,109 +1,367 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>The Lost Map — Builder's Journey</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body { background: #000; color: #fff; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace; display:flex; flex-direction:column; align-items:center; gap:12px; padding:28px; }
-    h1 { margin:0; font-size:18px; letter-spacing:1px; }
-    #screen-wrap { display:flex; gap:18px; align-items:center; }
-    canvas { image-rendering: pixelated; background:black; border:2px solid #222; }
-    .controls { display:flex; flex-direction:column; gap:8px; align-items:center; }
-    .btn { background:#111; color:#fff; border:1px solid #444; padding:8px 12px; cursor:pointer; }
-    .btn:hover{ filter:brightness(1.1); }
-    .banner { max-width:880px; width:100%; display:flex; justify-content:center; }
-    .projects { color:#ddd; max-width:880px; text-align:left; }
-    a.banner-link { text-decoration:none; display:inline-block; }
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+
+    /* CRT Master Container */
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #3f3;
+      font-family: 'Fira Code', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Screen Scanlines and Glitch Effects */
+    body::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 2;
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: rgba(0,0,0,0.1);
+      opacity: 0;
+      z-index: 2;
+      pointer-events: none;
+      animation: flicker 0.15s infinite;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.02; }
+      50% { opacity: 0.05; }
+      100% { opacity: 0.02; }
+    }
+
+    .crt-glow {
+      text-shadow: 0 0 5px #3f3, 0 0 10px #3f3, 0 0 15px #3f3;
+    }
+
+    /* Layout */
+    .container {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      padding: 40px 20px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .header-box {
+      border: 1px solid #3f3;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(51, 255, 51, 0.2), inset 0 0 15px rgba(51, 255, 51, 0.2);
+      width: 100%;
+      box-sizing: border-box;
+      background: rgba(0,20,0,0.4);
+    }
+    
+    h1 { margin: 0; font-size: 24px; letter-spacing: 2px; text-transform: uppercase; }
+    p.subtitle { margin: 10px 0 0 0; font-size: 14px; opacity: 0.8; }
+
+    /* Main Terminal Visual */
+    #screen-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+      width: 100%;
+    }
+
+    canvas {
+      image-rendering: pixelated;
+      background: #050505;
+      border: 2px solid #3f3;
+      box-shadow: 0 0 20px rgba(51, 255, 51, 0.3);
+      border-radius: 4px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button.btn {
+      background: transparent;
+      color: #3f3;
+      border: 1px solid #3f3;
+      padding: 10px 20px;
+      font-family: 'Fira Code', monospace;
+      font-size: 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button.btn:hover {
+      background: #3f3;
+      color: #000;
+      box-shadow: 0 0 15px #3f3;
+    }
+    
+    button.btn:active {
+      transform: scale(0.98);
+    }
+
+    .hint-text {
+      font-size: 12px;
+      color: #777;
+      text-align: center;
+      margin-top: 10px;
+      letter-spacing: 1px;
+    }
+
+    /* Projects Section */
+    .terminal-window {
+      width: 100%;
+      border: 1px solid #3f3;
+      margin-top: 20px;
+      background: rgba(0,10,0,0.8);
+      box-shadow: 0 0 10px rgba(51,255,51,0.1);
+    }
+    .terminal-header {
+      background: #3f3;
+      color: #000;
+      padding: 5px 10px;
+      font-weight: bold;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .terminal-body {
+      padding: 20px;
+    }
+    ul.project-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul.project-list li {
+      margin-bottom: 15px;
+      padding-left: 20px;
+      position: relative;
+    }
+    ul.project-list li::before {
+      content: ">";
+      position: absolute;
+      left: 0;
+      color: #3f3;
+      animation: blink 1s step-end infinite;
+    }
+    .project-name { font-weight: bold; color: #fff; text-shadow: none; font-size:16px;}
+    .project-desc { color: #aaa; font-size: 14px; display: block; margin-top:2px; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Modal */
+    #secret-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      border: 1px solid #f33;
+      padding: 30px;
+      max-width: 600px;
+      background: #000;
+      color: #f33;
+      text-shadow: 0 0 5px #f33;
+      box-shadow: 0 0 30px rgba(255, 51, 51, 0.3);
+    }
+    .modal-content h2 { margin-top:0; border-bottom: 1px solid #f33; padding-bottom:10px;}
+    .close-btn { background:transparent; border:1px solid #f33; color:#f33; padding:5px 15px; cursor:pointer; font-family:'Fira Code'; float:right; }
+    .close-btn:hover { background:#f33; color:#000; }
+
   </style>
 </head>
 <body>
-  <h1>The Lost Map — Builder's Journey</h1>
+  <div class="container">
+    <div class="header-box crt-glow">
+      <h1>The Lost Map</h1>
+      <p class="subtitle">SYSTEM INITIALIZED. WELCOME, VISITOR.</p>
+    </div>
 
-  <div class="banner">
-    <a class="banner-link" id="bannerLink" href="./index.html" target="_self">
-      <img id="bannerImg" src="./images/intro_bitmap.png" alt="Intro banner" style="width:640px; height:auto; display:block; border:1px solid #222;">
-    </a>
-  </div>
+    <div id="screen-wrap">
+      <!-- 64x24 logical resolution, scaled by CSS/JS -->
+      <canvas id="screen" width="64" height="24"></canvas>
 
-  <div id="screen-wrap">
-    <canvas id="screen" width="64" height="24"></canvas>
+      <div class="controls">
+        <button class="btn" id="playBtn">[ Play Audio ]</button>
+        <button class="btn" id="introBtn">[ Restart Sequence ]</button>
+        <button class="btn" id="hintBtn">[ Access Logs ]</button>
+      </div>
+      <div class="hint-text">
+        Press [ ↓ ] to scroll down. Terminal awaits keyboard input...
+      </div>
+    </div>
 
-    <div class="controls">
-      <button class="btn" id="playBtn">Play Retro Beep</button>
-      <button class="btn" id="introBtn">Restart Intro</button>
-      <button class="btn" id="hintBtn">Show Secret Hint</button>
-      <div style="font-size:13px; color:#999; max-width:260px; text-align:center;">
-        Use keyboard: ↓ to continue, q to close. Try a secret key sequence...
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <span>root@nexus:~/projects/public</span>
+        <span>[ OK ]</span>
+      </div>
+      <div class="terminal-body">
+        <ul class="project-list" id="projectList">
+          <li>
+            <span class="project-name">atlas-engine</span>
+            <span class="project-desc">Procedural map engine for terminal vector spaces [WIP]</span>
+          </li>
+          <li>
+            <span class="project-name">retro-ui</span>
+            <span class="project-desc">Terminal retro UI Proof-of-Concept libraries</span>
+          </li>
+          <li>
+            <span class="project-name">docs-hub</span>
+            <span class="project-desc">Central documentation aggregator core</span>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 
-  <div class="projects">
-    <h3>Public Projects (in progress)</h3>
-    <ul id="projectList">
-      <li><strong>atlas-engine</strong> — Procedural map engine (WIP)</li>
-      <li><strong>retro-ui</strong> — Terminal retro UI POC</li>
-      <li><strong>docs-hub</strong> — Central docs aggregator (draft)</li>
-    </ul>
+  <div id="secret-modal">
+    <div class="modal-content">
+      <h2>WARNING: CLASSIFIED ACCESS</h2>
+      <p>The atlas hides where forks meet. Seek coordinates within repositories starting with <code>atlas-</code>.</p>
+      <p style="color:#777; font-size:12px;">(Transmission End)</p>
+      <button id="closeModal" class="close-btn">ACKNOWLEDGE</button>
+    </div>
   </div>
 
   <script>
     const BITMAP = [
-"0000000000000000000000000000000000000000000000000000000000000000",
-"0000000000010000000000000000000000000000000000001000000000000000",
-"0000000000000000000000000011100000000000000000000000011100000000",
-"0000000000000000000011111111000000000000000000001111111100000000",
-"0000000000001111111111111111000000000000111111111000000000000000",
-"0000000000000111110000000000111100000001110000001000000000000000",
-"0000000000011110000000000000001110000011100000001100000000000000",
-"0000000001111000000000000000000011110001110000001110000000000000",
-"0000001111000000000011000000000000111111110000001111100000000000",
-"0000011110000000000111100000000000110000000000011111100000000000",
-"0000111100000000001111110000000000001110000001111000111000000000",
-"0001111000000000011000000000000000000000000011100000111100000000",
-"0011110000000000110000000000000000000000000000001110011110000000",
-"0111100000000001110000000000000000000011110000000011111100000000",
-"1111000000000111100000000000000111110000000000000000111110000000",
-"1110000000001111111000000000111111000000000000000000011111000000",
-"1100000000011111110000111111111000000000000000000000001111100000",
-"1000000011111111000011111111111100000000000000000000000111110000",
-"0000000111111000001111111111111000000000000000000000000011111000",
-"0000000011111111111111111111111000000000000000000000000001111100",
-"0000000000111111111111111111111100000000000000000000000000111110",
-"0000000000001111111111111111111000000000000000000000000000011111",
-"0000000000000001111111110000000000000000000000000000000000001111",
-"0000000000000000000000000000000000000000000000000000000000000000",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "0000000000010000000000000000000000000000000000001000000000000000",
+      "0000000000000000000000000011100000000000000000000000011100000000",
+      "0000000000000000000011111111000000000000000000001111111100000000",
+      "0000000000001111111111111111000000000000111111111000000000000000",
+      "0000000000000111110000000000111100000001110000001000000000000000",
+      "0000000000011110000000000000001110000011100000001100000000000000",
+      "0000000001111000000000000000000011110001110000001110000000000000",
+      "0000001111000000000011000000000000111111110000001111100000000000",
+      "0000011110000000000111100000000000110000000000011111100000000000",
+      "0000111100000000001111110000000000001110000001111000111000000000",
+      "0001111000000000011000000000000000000000000011100000111100000000",
+      "0011110000000000110000000000000000000000000000001110011110000000",
+      "0111100000000001110000000000000000000011110000000011111100000000",
+      "1111000000000111100000000000000111110000000000000000111110000000",
+      "1110000000001111111000000000111111000000000000000000011111000000",
+      "1100000000011111110000111111111000000000000000000000001111100000",
+      "1000000011111111000011111111111100000000000000000000000111110000",
+      "0000000111111000001111111111111000000000000000000000000011111000",
+      "0000000011111111111111111111111000000000000000000000000001111100",
+      "0000000000111111111111111111111100000000000000000000000000111110",
+      "0000000000001111111111111111111000000000000000000000000000011111",
+      "0000000000000001111111110000000000000000000000000000000000001111",
+      "0000000000000000000000000000000000000000000000000000000000000000"
     ];
 
     const canvas = document.getElementById('screen');
     const ctx = canvas.getContext('2d');
-    const scale = 8; // enlarge for display
-    canvas.style.width = (canvas.width * scale) + 'px';
-    canvas.style.height = (canvas.height * scale) + 'px';
+    
+    // Scale for visual size but keep original pixel logic
+    const scaleX = 12; 
+    const scaleY = 12;
+    canvas.style.width = (canvas.width * scaleX) + 'px';
+    canvas.style.height = (canvas.height * scaleY) + 'px';
+
+    const COLOR_BG = '#000000';
+    const COLOR_FG = '#33ff33'; // bright phosphor green
+
+    function drawPixel(x, y, color) {
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, 1, 1);
+    }
 
     function drawBitmap() {
-      ctx.fillStyle = 'black';
-      ctx.fillRect(0,0,canvas.width, canvas.height);
-      ctx.fillStyle = 'white';
-      for (let y=0;y<BITMAP.length;y++){ 
-        for (let x=0;x<BITMAP[y].length;x++){ 
-          if (BITMAP[y][x] === '1') ctx.fillRect(x,y,1,1);
+      ctx.fillStyle = COLOR_BG;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let y = 0; y < BITMAP.length; y++) { 
+        for (let x = 0; x < BITMAP[y].length; x++) { 
+          if (BITMAP[y][x] === '1') {
+            drawPixel(x, y, COLOR_FG);
+          }
         }
       }
     }
 
-    drawBitmap();
-
-    function flickerOnce() {
-      const y = Math.floor(Math.random() * canvas.height);
-      ctx.fillStyle = 'rgba(255,255,255,0.06)';
-      ctx.fillRect(0, y, canvas.width, 1);
-      setTimeout(() => drawBitmap(), 90);
+    function generateGlitch() {
+      drawBitmap();
+      if(Math.random() > 0.7) {
+        // Horizontal offset tear
+        const yLine = Math.floor(Math.random() * canvas.height);
+        const shiftX = Math.floor(Math.random() * 6) - 3;
+        const widthTear = Math.floor(Math.random() * 20);
+        
+        ctx.fillStyle = COLOR_BG;
+        ctx.fillRect(0, yLine, canvas.width, 1);
+        
+        for (let x = 0; x < widthTear; x++) {
+          let srcX = x;
+          let destX = x + shiftX;
+          if(BITMAP[yLine] && BITMAP[yLine][srcX] === '1') {
+             drawPixel(destX, yLine, COLOR_FG);
+          }
+        }
+      }
     }
 
+    // Initial draw
+    drawBitmap();
+    setInterval(() => { if(Math.random() > 0.8) generateGlitch(); else drawBitmap(); }, 150);
+
+    // Audio Context Setup
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    const audioCtx = AudioCtx ? new AudioCtx() : null;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx && AudioCtx) {
+        audioCtx = new AudioCtx();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
 
     function playSquare(freq, length, t0) {
       if (!audioCtx || freq <= 0) return;
@@ -113,13 +371,36 @@
       o.frequency.value = freq;
       o.connect(g);
       g.connect(audioCtx.destination);
-      g.gain.setValueAtTime(0.2, t0);
+      g.gain.setValueAtTime(0.15, t0);
       g.gain.exponentialRampToValueAtTime(0.001, t0 + length);
       o.start(t0);
-      o.stop(t0 + length + 0.02);
+      o.stop(t0 + length + 0.05);
     }
 
-    function playMelody() {
+    function playSystemBootSound() {
+      initAudio();
+      if (!audioCtx) return;
+      
+      const t = audioCtx.currentTime;
+      playSquare(440, 0.1, t);
+      playSquare(880, 0.15, t + 0.1);
+      playSquare(220, 0.2, t + 0.25);
+    }
+
+    // Modal Control
+    const modal = document.getElementById('secret-modal');
+    function openModal() {
+      modal.style.display = 'flex';
+      playSystemBootSound();
+    }
+    function closeModal() {
+      modal.style.display = 'none';
+      initAudio();
+      if(audioCtx) playSquare(220, 0.1, audioCtx.currentTime);
+    }
+
+    document.getElementById('playBtn').addEventListener('click', () => {
+      initAudio();
       if (!audioCtx) return;
       const notes = [[880,0.08],[0,0.02],[880,0.08],[0,0.02],[880,0.08],[0,0.02],[698,0.14],[1046,0.14]];
       let t = audioCtx.currentTime;
@@ -127,56 +408,33 @@
         if (f>0) playSquare(f,d,t);
         t += d;
       }
-    }
+    });
 
+    document.getElementById('introBtn').addEventListener('click', () => {
+      initAudio();
+      if(audioCtx) playSquare(1760, 0.1, audioCtx.currentTime);
+      drawBitmap();
+    });
+
+    document.getElementById('hintBtn').addEventListener('click', openModal);
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+
+    // Keyboard Sequence (Konami-ish)
     const SECRET = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
     let buf = [];
-    function feedKey(k) {
-      buf.push(k);
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' && e.target === document.body) {
+        window.scrollBy({ top: 150, left: 0, behavior: 'smooth' });
+      }
+      
+      buf.push(e.key);
       if (buf.length > SECRET.length) buf.shift();
       if (buf.join(",") === SECRET.join(",")) {
-        showSecret();
+        openModal();
         buf = [];
       }
-    }
-
-    function showSecret() {
-      const modal = document.createElement('div');
-      modal.style.position='fixed';
-      modal.style.left='0'; modal.style.top='0';
-      modal.style.width='100%'; modal.style.height='100%';
-      modal.style.display='flex'; modal.style.alignItems='center'; modal.style.justifyContent='center';
-      modal.style.background='rgba(0,0,0,0.85)'; modal.style.color='#fff'; modal.style.zIndex='9999';
-      modal.innerHTML = `
-        <div style="max-width:720px; padding:20px; border:1px solid #333;">
-          <h2>비밀의 속삭임</h2>
-          <p>The atlas hides where forks meet. Look for repo starting with <code>atlas-</code>.</p>
-          <p style="color:#999; font-size:13px;">(This is a hint only — do not expose secrets publicly.)</p>
-          <div style="text-align:right;"><button id="closeModal" class="btn">Close</button></div>
-        </div>`;
-      document.body.appendChild(modal);
-      document.getElementById('closeModal').onclick = () => { document.body.removeChild(modal); }
-    }
-
-    document.getElementById('playBtn').addEventListener('click', () => {
-      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-      playMelody();
-      flickerOnce();
-    });
-    document.getElementById('introBtn').addEventListener('click', () => {
-      drawBitmap();
-      flickerOnce();
-    });
-    document.getElementById('hintBtn').addEventListener('click', () => showSecret());
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown') {
-        document.querySelector('.projects').scrollIntoView({behavior:'smooth'});
-      }
-      feedKey(e.key);
     });
 
-    setInterval(() => { flickerOnce(); }, 2200);
   </script>
 </body>
 </html>

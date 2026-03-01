@@ -1,13 +1,18 @@
-[![The Lost Map — Intro](./images/intro_bitmap.svg)](https://redsunjin.github.io/.github/index.html)
+# ✨ Hello — I'm redsunjin
 
-# Hello — I'm redsunjin
+**Builder of retro tools and vector worlds.**
 
-Builder of retro tools and vector worlds.  
-Click the banner to open an interactive 80s-style intro with retro beeps.
+> 📺 **[Launch Interactive ASCII Retro Intro](https://redsunjin.github.io/.github/index.html)**
+> 
+> *Click the link above to experience the 80s-style interactive terminal!*
 
-## Projects (in progress)
-- atlas-engine — Procedural map engine (WIP)
-- retro-ui — Terminal retro UI POC
-- docs-hub — Central docs aggregator
+## 🚀 Projects (in progress)
+- **`atlas-engine`** — Procedural map engine (WIP)
+- **`retro-ui`** — Terminal retro UI POC
+- **`docs-hub`** — Central docs aggregator
 
-(Secret hints available in the intro — look for repositories starting with `atlas-`.)
+<details>
+<summary>🕵️ Secret Hint</summary>
+<br>
+<i>The atlas hides where forks meet. Look for repositories starting with <code>atlas-</code>. Check out the interactive intro for more secrets.</i>
+</details>
