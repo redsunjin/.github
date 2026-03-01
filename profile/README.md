@@ -1,18 +1,19 @@
-# ✨ Hello — I'm redsunjin
+# 🌃 Hello — I'm redsunjin
 
-**Builder of retro tools and vector worlds.**
+**An ordinary builder weaving code in the vector space.**
 
-> 📺 **[Launch Interactive ASCII Retro Intro](https://redsunjin.github.io/.github/index.html)**
+> 🕹️ **[ Enter The Builder's Tale ](https://redsunjin.github.io/.github/index.html)**
 > 
-> *Click the link above to experience the 80s-style interactive terminal!*
+> *Click the link above to explore an interactive 90s-style adventure of everyday creation.*
 
-## 🚀 Projects (in progress)
-- **`atlas-engine`** — Procedural map engine (WIP)
+## 🔨 Construction Sites (Public)
+Here are the monoliths I'm currently laying bricks for:
+- **`atlas-engine`** — A procedural map engine for vector spaces (WIP)
 - **`retro-ui`** — Terminal retro UI POC
 - **`docs-hub`** — Central docs aggregator
 
 <details>
-<summary>🕵️ Secret Hint</summary>
+<summary>🌫️ The Fog of War (Private)</summary>
 <br>
-<i>The atlas hides where forks meet. Look for repositories starting with <code>atlas-</code>. Check out the interactive intro for more secrets.</i>
+<i>Hidden structures lie deep in the mist. Focus your eyes on the <code>atlas-</code> structures. You might find a secret... or a game.</i>
 </details>
