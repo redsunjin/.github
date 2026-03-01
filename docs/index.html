@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <title>The Builder's Tale</title>
@@ -24,18 +23,35 @@
       user-select: none;
     }
 
-    /* 메인 게임 컨테이너 */
+    /* 언어 토글 스위치 영역 */
+    #lang-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #222;
+      border: 2px solid #5cf;
+      padding: 5px 10px;
+      cursor: pointer;
+      color: #5cf;
+      z-index: 100;
+    }
+    #lang-toggle:hover {
+      background: #5cf;
+      color: #000;
+    }
+
     #game-container {
       width: 100%;
       max-width: 800px;
-      margin-top: 20px;
+      margin-top: 50px;
       border: 4px solid #fff;
       background: #000;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
 
-    /* 상단: 캔버스 아트 워크 (방 뷰포트) */
+    /* 상단: 캔버스 아트 워크 */
     #viewport {
       width: 100%;
       height: 360px;
@@ -47,37 +63,32 @@
     canvas#scene {
       width: 100%;
       height: 100%;
-      image-rendering: pixelated;
-      /* 도트 렌더링 유지 */
+      image-rendering: pixelated; /* 도트 유지 */
     }
 
-    /* 이스터에그 핑퐁 UI 캔버스 (평소엔 숨김) */
+    /* 핑퐁 레이어 */
     canvas#pong {
       display: none;
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.95);
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.95);
       z-index: 10;
     }
-
+    
     #pong-msg {
       display: none;
       position: absolute;
-      top: 50%;
-      width: 100%;
+      top: 50%; width: 100%;
       text-align: center;
-      color: #fff;
-      z-index: 11;
+      color: #fff; z-index: 11;
       font-size: 28px;
       text-shadow: 2px 2px #f00;
       transform: translateY(-50%);
       pointer-events: none;
     }
 
-    /* 하단: 조작 패널 & 텍스트 노벨 UI */
+    /* 액션 패널 */
     #action-panel {
       display: flex;
       flex-direction: row;
@@ -85,7 +96,6 @@
       background: #000;
     }
 
-    /* 좌측 명령어 (동사) 리스트 */
     #verbs {
       width: 30%;
       padding: 15px;
@@ -101,114 +111,64 @@
       cursor: pointer;
       text-align: center;
     }
-
-    .verb:hover,
-    .verb.active {
+    .verb:hover, .verb.active {
       color: #fff;
       text-decoration: underline;
     }
 
-    /* 우측 텍스트 다이얼로그 출력부 */
     #dialogue {
       width: 70%;
       padding: 20px;
       box-sizing: border-box;
-      color: #5cf;
-      /* 고전 루카스아츠 UI 블루 텍스트 */
+      color: #5cf; 
       line-height: 1.4;
       overflow-y: auto;
     }
+    
+    .text-title { color: #fff; display:block; margin-bottom:12px; font-size: 28px; border-bottom: 2px dashed #5cf; padding-bottom:5px;}
+    .text-item { margin-bottom: 10px; display:block; line-height: 1.2;}
+    .text-link { color: #f55; text-decoration: none; border-bottom: 1px dotted #f55; cursor: pointer; }
+    .text-link:hover { color: #fff; border-bottom: 1px solid #fff; }
+    .text-highlight { color: #fe0; }
 
-    /* 텍스트 내부 꾸밈 */
-    .text-title {
-      color: #fff;
-      display: block;
-      margin-bottom: 12px;
-      font-size: 28px;
-      border-bottom: 2px dashed #5cf;
-      padding-bottom: 5px;
-    }
-
-    .text-item {
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .text-link {
-      color: #f55;
-      text-decoration: none;
-      border-bottom: 1px dotted #f55;
-      cursor: pointer;
-    }
-
-    .text-link:hover {
-      color: #fff;
-      border-bottom: 1px solid #fff;
-    }
-
-    .text-highlight {
-      color: #fe0;
-    }
-
-    /* 커서 타이핑 효과 점 */
     .cursor {
       display: inline-block;
-      width: 12px;
-      height: 20px;
+      width: 12px; height: 20px;
       background: #5cf;
       vertical-align: bottom;
       animation: blink 1s step-end infinite;
     }
 
-    @keyframes blink {
-      50% {
-        opacity: 0;
-      }
-    }
+    @keyframes blink { 50% { opacity: 0; } }
 
-    /* 감동을 주는 상단 문구 */
-    .title-banner {
-      margin-top: 30px;
-      font-size: 32px;
-      letter-spacing: 2px;
-      text-align: center;
-      color: #fff;
-    }
+    .title-banner { margin-top:30px; font-size: 32px; letter-spacing: 2px; text-align: center; color: #fff;}
+    .subtitle { font-size: 18px; color: #aaa; margin-top:5px;}
 
-    .subtitle {
-      font-size: 18px;
-      color: #aaa;
-      margin-top: 5px;
-    }
   </style>
 </head>
-
 <body>
+  
+  <div id="lang-toggle">LANG: EN</div>
 
-  <div class="title-banner">The Builder's Tale</div>
-  <div class="subtitle">"Ordinary lines of code form extraordinary worlds."</div>
+  <div class="title-banner" id="mainTitle">The Builder's Tale</div>
+  <div class="subtitle" id="subTitle">"Ordinary lines of code form extraordinary worlds."</div>
 
   <div id="game-container">
     <div id="viewport">
-      <!-- 배경 애니메이션 캔버스 -->
       <canvas id="scene" width="320" height="144"></canvas>
-
-      <!-- 비밀 핑퐁 게임 캔버스 -->
       <canvas id="pong" width="320" height="144"></canvas>
-      <div id="pong-msg">PRESS SPACE TO SERVE<br><span style="font-size:16px;">(Arrow Keys to move, Q to quit)</span>
-      </div>
+      <div id="pong-msg" id="pongMsgDisplay">PRESS SPACE TO SERVE<br><span style="font-size:16px;">(Arrow Keys to move, Q to quit)</span></div>
     </div>
-
+    
     <div id="action-panel">
-      <!-- 동작 명령어 목록 -->
       <div id="verbs">
-        <div class="verb active" data-action="intro">Look at Man</div>
-        <div class="verb" data-action="examine">Examine Desk</div>
-        <div class="verb" data-action="open">Open Drawer</div>
-        <div class="verb" data-action="play" id="secret-btn" style="color:#333;">Play</div>
+        <!-- 버튼 텍스트는 JS에서 언어에 따라 그려짐 -->
+        <div class="verb active" data-action="intro" id="btn-intro">Look at Man</div>
+        <div class="verb" data-action="examine" id="btn-examine">Examine Desk</div>
+        <div class="verb" data-action="open" id="btn-open">Open Drawer</div>
+        <div class="verb" data-action="play" id="btn-play" style="color:#333;">Play</div>
       </div>
-
-      <!-- 결과 텍스트 출력창 -->
+      
       <div id="dialogue">
         <span id="text-content"></span><span class="cursor" id="cursor"></span>
       </div>
@@ -217,67 +177,188 @@
 
   <script>
     // -----------------------------------------------------
-    // 1. 대사 및 스크립트 데이터
+    // 1. 다국어 데이터 (i18n)
     // -----------------------------------------------------
-    const scripts = {
-      default: "What should I do? It is quiet here...\nThe gentle glow of the monitor is the only light.",
-      intro: "It is late at night. The office is empty.\nA tired worker stares at the glowing screen.\nHe is not casting spells, nor slaying dragons...\n\nHe is just laying down simple blocks of code, one by one.\nAnd yet... in the vector space inside the machine,\nentire worlds are being built.",
-      examine: "<span class='text-title'>[ Public Projects : The Architect's Desk ]</span><span class='text-item'>- <a href='https://github.com/redsunjin/maestro-coding' target='_blank' class='text-link'>maestro-coding</a> : AI 에이전트와 함께하는 코드 심포니 🎼</span><span class='text-item'>- <a href='https://github.com/redsunjin/trunk_rag' target='_blank' class='text-link'>trunk_rag</a> : 폐쇄망/로컬 환경에서 사용하는 경량 RAG.</span><span class='text-item'>- <a href='https://github.com/redsunjin/OpenCourse-TTS-Helper' target='_blank' class='text-link'>OpenCourse-TTS-Helper</a> : 온라인 학습 스크립트 기반 브라우저 확장.</span>\nThese structures are small, but they hold the sky up.",
-      open: "You slowly open the locked drawer. The mist of <span class='text-highlight'>Private Repositories</span> spills out.\nYou can barely make out shapes of future monoliths.\nHidden modules. Unreleased architectures.\n\n<span style='color:#777;'>Hint: Focus on the 'atlas' prefixes in the public domain.</span>\nThe drawer closes before you see too much.",
-      play: "Wait... a strange program executes..."
+    const i18n = {
+      en: {
+        title: "The Builder's Tale",
+        subTitle: '"Ordinary lines of code form extraordinary worlds."',
+        btnIntro: "Look at (Intro)",
+        btnExamine: "Examine (Public)",
+        btnOpen: "Open (Private)",
+        btnPlay: "Play",
+        pongMsg: "PRESS SPACE TO SERVE<br><span style='font-size:16px;'>(Arrow Keys to move, Q to quit)</span>",
+        scripts: {
+          default: "What should I do? It is quiet here...\nThe gentle glow of the monitor is the only light.",
+          intro: "It is late at night. The office is empty.\nA tired worker stares at the glowing screen.\nHe is not casting spells, nor slaying dragons...\n\nHe is just laying down simple blocks of code, one by one.\nAnd yet... in the vector space inside the machine,\nentire worlds are being built.",
+          examine: "<span class='text-title'>[ Public Projects : The Architect's Desk ]</span><span class='text-item'>- <a href='https://github.com/redsunjin/maestro-coding' target='_blank' class='text-link'>maestro-coding</a> : AI Agents Code Symphony 🎼</span><span class='text-item'>- <a href='https://github.com/redsunjin/trunk_rag' target='_blank' class='text-link'>trunk_rag</a> : Local Network Lightweight RAG.</span><span class='text-item'>- <a href='https://github.com/redsunjin/OpenCourse-TTS-Helper' target='_blank' class='text-link'>OpenCourse-TTS-Helper</a> : Online Learning TTS Browser Extension.</span><br>These structures are small, but they hold the sky up.",
+          open: "You slowly open the locked drawer. The mist of <span class='text-highlight'>Private Repositories</span> spills out.\nYou can barely make out shapes of future monoliths.\nHidden modules. Unreleased architectures.\n\n<span style='color:#777;'>Hint: Focus on the 'atlas' prefixes in the public domain.</span>\nThe drawer closes before you see too much.",
+          play: "Wait... a strange program executes...",
+          pongExit: "Game terminated. The man returns to coding."
+        }
+      },
+      ko: {
+        title: "기록의 조각들 (The Builder's Tale)",
+        subTitle: '"코드 한 줄의 평범함이 비범한 세계를 빚어낸다."',
+        btnIntro: "바라본다 (Intro)",
+        btnExamine: "살펴본다 (Public)",
+        btnOpen: "열어본다 (Private)",
+        btnPlay: "즐긴다",
+        pongMsg: "서브하려면 스페이스바를 누르세요<br><span style='font-size:16px;'>(방향키: 이동, Q: 종료)</span>",
+        scripts: {
+          default: "무엇을 해야 할까? 사방이 고요하다...\n오직 모니터의 희미한 불빛만이 공간을 채운다.",
+          intro: "늦은 밤, 텅 빈 사무실.\n피곤에 지친 직장인이 빛나는 화면을 응시하고 있다.\n그는 마법을 부리거나 드래곤과 싸우지 않는다...\n\n그저 평범한 코드 블록들을 묵묵히 하나씩 쌓아 올릴 뿐이다.\n그러나... 기계 안의 벡터 스페이스에서는,\n어느새 거대한 세계가 지어지고 있다.",
+          examine: "<span class='text-title'>[ Public Projects : 건축가의 책상 ]</span><span class='text-item'>- <a href='https://github.com/redsunjin/maestro-coding' target='_blank' class='text-link'>maestro-coding</a> : 코딩을 지휘하다 - AI 에이전트 심포니 🎼</span><span class='text-item'>- <a href='https://github.com/redsunjin/trunk_rag' target='_blank' class='text-link'>trunk_rag</a> : 폐쇄망/로컬 환경 경량 RAG.</span><span class='text-item'>- <a href='https://github.com/redsunjin/OpenCourse-TTS-Helper' target='_blank' class='text-link'>OpenCourse-TTS-Helper</a> : 온라인 학습 플랫폼 음성 보조 브라우저 확장.</span><br>이 구조물들은 작지만 든든하게 세상의 한 축을 지탱한다.",
+          open: "잠겨 있던 서랍을 천천히 엽니다. <span class='text-highlight'>비공개 프로젝트(Private)</span>의 안개가 흘러나옵니다.\n거대한 모놀리스의 흐릿한 윤곽이 보입니다.\n숨겨진 모듈과 아직 형태를 갖추지 못한 아키텍처들.\n\n<span style='color:#777;'>힌트: 퍼블릭 목록의 'atlas' 접두어에 주목하십시오.</span>\n너무 많은 것을 보기 전에 서랍이 스르륵 닫혀 버립니다.",
+          play: "잠깐... 알 수 없는 프로그램이 실행됩니다...",
+          pongExit: "게임이 종료되었습니다. 남자는 다시 현실로 돌아가 코딩을 시작합니다."
+        }
+      }
     };
 
-    // -----------------------------------------------------
-    // 2. 도트 그래픽 그리기 (Canvas API)
-    // 평범한 직장인이 모니터(벡터스페이스) 앞에 앉아있는 모습
-    // -----------------------------------------------------
-    const sceneCanvas = document.getElementById('scene');
-    const ctx = sceneCanvas.getContext('2d');
+    let currLang = 'en';
+    let currentAction = 'intro';
 
-    function drawScene(frame) {
-      // Background (Dark room)
-      ctx.fillStyle = "#000";
-      ctx.fillRect(0, 0, 320, 144);
+    const langToggleBtn = document.getElementById('lang-toggle');
+    langToggleBtn.addEventListener('click', () => {
+      currLang = (currLang === 'en') ? 'ko' : 'en';
+      langToggleBtn.innerText = `LANG: ${currLang.toUpperCase()}`;
+      updateUI();
+      // 재출력
+      typeLine(i18n[currLang].scripts[currentAction]);
+    });
 
-      // Window on the wall
-      ctx.fillStyle = "#222";
-      ctx.fillRect(220, 20, 80, 80);
-
-      // The Monitor (Gateway to vector space)
-      const glowStr = Math.floor((Math.sin(frame * 0.05) * 0.5 + 0.5) * 40);
-      ctx.fillStyle = `rgb(10, ${60 + glowStr}, ${30 + glowStr})`; // vector green glow
-      ctx.fillRect(60, 40, 100, 70);
-
-      // Desk & Monitor Frame
-      ctx.fillStyle = "#ccc";
-      ctx.fillRect(58, 38, 2, 74); ctx.fillRect(160, 38, 2, 74); // monitor sides
-      ctx.fillRect(58, 38, 104, 2); ctx.fillRect(58, 110, 104, 2); // monitor top/bottom
-
-      ctx.fillRect(0, 130, 320, 2); // desk surface
-      ctx.fillRect(30, 132, 160, 12); // desk thick
-
-      // Character Silhouette (The Ordinary Guy)
-      ctx.fillStyle = "#aaa";
-      ctx.fillRect(110, 70, 16, 18); // Head
-      ctx.fillRect(100, 88, 30, 42); // Body
-
-      // Simple typing arm animation (2 frames)
-      if (frame % 30 < 15) {
-        ctx.fillRect(80, 105, 20, 4); // Arm up
-      } else {
-        ctx.fillRect(80, 112, 20, 4); // Arm down
-      }
-
-      // Keyboard
-      ctx.fillStyle = "#666";
-      ctx.fillRect(60, 126, 30, 4);
+    function updateUI() {
+      document.getElementById('mainTitle').innerText = i18n[currLang].title;
+      document.getElementById('subTitle').innerText = i18n[currLang].subTitle;
+      document.getElementById('btn-intro').innerText = i18n[currLang].btnIntro;
+      document.getElementById('btn-examine').innerText = i18n[currLang].btnExamine;
+      document.getElementById('btn-open').innerText = i18n[currLang].btnOpen;
+      document.getElementById('btn-play').innerText = i18n[currLang].btnPlay;
+      document.getElementById('pong-msg').innerHTML = i18n[currLang].pongMsg;
     }
 
+    // -----------------------------------------------------
+    // 2. 도트 캔버스 (디테일 업된 배경, 소품 및 애니메이션)
+    // -----------------------------------------------------
+    const MathRand = Math.random;
+    
+    // 별 좌표 사전 생성 (깜빡임 효과 위함)
+    const stars = [];
+    for(let i=0; i<30; i++) {
+        stars.push({x: 222 + MathRand()*76, y: 22 + MathRand()*76, speed: 0.05 + MathRand()*0.1, phase: MathRand()*Math.PI*2});
+    }
+
+    const sceneCanvas = document.getElementById('scene');
+    const ctx = sceneCanvas.getContext('2d');
+    
+    function drawScene(frame) {
+      // Background (어두운 실내)
+      ctx.fillStyle = "#0c0c0c";
+      ctx.fillRect(0, 0, 320, 144);
+      
+      // 창밖 뷰포트 (빌딩 숲 야경과 밤하늘)
+      ctx.fillStyle = "#111820";
+      ctx.fillRect(220, 20, 80, 80);
+      
+      // 2.1 별과 깜빡이는 불빛 그리기
+      stars.forEach(s => {
+          let alpha = (Math.sin(frame * s.speed + s.phase) + 1) / 2;
+          ctx.fillStyle = `rgba(200, 200, 255, ${alpha * 0.8})`;
+          ctx.fillRect(s.x, s.y, 1, 1);
+      });
+
+      // 창턱 프레임
+      ctx.fillStyle = "#333";
+      ctx.fillRect(218, 18, 2, 84); ctx.fillRect(300, 18, 2, 84); 
+      ctx.fillRect(218, 18, 84, 2); ctx.fillRect(218, 100, 84, 2);
+      
+      // 2.2 부드러워진 모니터 테두리
+      ctx.fillStyle = "#aab";
+      ctx.fillRect(58, 38, 2, 74); ctx.fillRect(160, 38, 2, 74); // 양옆
+      ctx.fillRect(58, 38, 104, 2); ctx.fillRect(58, 110, 104, 2); // 위아랫
+      
+      // 2.3 모니터 빛(일렁이는 글로우)
+      const glowStr = Math.floor((Math.sin(frame * 0.04) * 0.5 + 0.5) * 30); 
+      ctx.fillStyle = `rgb(10, ${50 + glowStr}, ${40 + glowStr/2})`; 
+      ctx.fillRect(60, 40, 100, 70); 
+      
+      // 모니터 위 코드 흐름 표시(더미 데코레이션 픽셀)
+      ctx.fillStyle = `rgba(50,255,100,${0.3 + glowStr/100})`;
+      if(frame % 20 > 5) ctx.fillRect(65, 45, 15, 2);
+      if(frame % 20 > 10) ctx.fillRect(65, 50, 25, 2);
+      if(frame % 20 > 15) ctx.fillRect(65, 60, 10, 2);
+
+      // 2.4 책상과 그림자 디테일
+      ctx.fillStyle = "#654321"; // 우드톤 책상
+      ctx.fillRect(0, 130, 320, 2);
+      ctx.fillStyle = "#3D2B1F";
+      ctx.fillRect(30, 132, 160, 12);
+      
+      // 책상 밑 그림자
+      ctx.fillStyle = "#0a0a0a";
+      ctx.fillRect(0, 140, 320, 4);
+
+      // 2.5 소품: 모락모락 김나는 커피 머그잔
+      ctx.fillStyle = "#ddd";
+      ctx.fillRect(180, 122, 10, 10);
+      ctx.fillRect(190, 124, 2, 6); // 손잡이
+      ctx.fillStyle = "#310"; // 커피 액체 약간
+      ctx.fillRect(182, 122, 6, 2);
+      
+      // 연기 애니메이션 (sin 파를 이용해 흩어짐)
+      ctx.fillStyle = "rgba(200, 200, 200, 0.3)";
+      const sX = 184 + Math.sin(frame * 0.1) * 2;
+      const sY = 118 - (frame % 15) * 0.5;
+      if(frame % 30 < 20) ctx.fillRect(sX, sY, 3, 3);
+      if(frame % 30 < 10) ctx.fillRect(sX + 1, sY - 4, 4, 3);
+
+      // 2.6 의자 등받이
+      ctx.fillStyle = "#2a2a2a";
+      ctx.fillRect(90, 90, 12, 40);
+
+      // 2.7 캐릭터 (디테일 묘사)
+      // 헤드폰 낀 머리
+      ctx.fillStyle = "#888"; // 머리카락/머리
+      ctx.fillRect(110, 68, 16, 18);
+      ctx.fillStyle = "#333"; // 헤드폰 밴드 및 이어컵
+      ctx.fillRect(108, 64, 20, 4);
+      ctx.fillRect(106, 68, 4, 10); ctx.fillRect(126, 68, 4, 10);
+
+      // 옷 (어깨, 등판 분리)
+      ctx.fillStyle = "#556677"; // 셔츠 색상
+      ctx.fillRect(100, 86, 30, 44);
+      ctx.fillStyle = "#445566"; // 옷 주름/그림자 효과
+      ctx.fillRect(100, 86, 6, 44);
+
+      // 팔 및 타이핑하는 손가락 애니메이션
+      ctx.fillStyle = "#667788";
+      // 왼팔 타자
+      if(frame % 10 < 5) {
+        ctx.fillRect(80, 106, 20, 5);
+        ctx.fillStyle = "#eec3a4"; // 살구색 손
+        ctx.fillRect(76, 108, 4, 3);
+      } else {
+        ctx.fillRect(80, 114, 20, 5);
+        ctx.fillStyle = "#eec3a4"; 
+        ctx.fillRect(76, 116, 4, 3);
+      }
+      
+      // 키보드 디테일
+      ctx.fillStyle = "#555";
+      ctx.fillRect(60, 126, 35, 4);
+      // 키보드 키 깜빡임 (자판 누를때 그림자)
+      if(frame % 10 < 5) {
+        ctx.fillStyle = "#333";
+        ctx.fillRect(65+ (frame%15), 126, 2, 2);
+      }
+    }
+    
     let sceneFrame = 0;
     setInterval(() => { drawScene(sceneFrame++); }, 100);
 
     // -----------------------------------------------------
-    // 3. 타이핑 효과 및 패널 로직
+    // 3. 타이핑 엔진 (DOM 조작)
     // -----------------------------------------------------
     const domText = document.getElementById('text-content');
     const verbs = document.querySelectorAll('.verb');
@@ -285,182 +366,172 @@
     let isPongActive = false;
 
     function typeLine(htmlStr) {
-      if (typeTimer) clearInterval(typeTimer);
+      if(typeTimer) clearInterval(typeTimer);
       domText.innerHTML = "";
-
+      
       let i = 0;
       let buffer = "";
-
+      
       typeTimer = setInterval(() => {
-        if (i >= htmlStr.length) {
+        if(i >= htmlStr.length) {
           clearInterval(typeTimer);
           return;
         }
-
-        // HTML 태그는 한 번에 출력되도록 처리
-        if (htmlStr[i] === '<') {
+        
+        // 태그 한 번에 건너뛰기
+        if(htmlStr[i] === '<') {
           let tag = "";
-          while (htmlStr[i] !== '>' && i < htmlStr.length) {
+          while(htmlStr[i] !== '>' && i < htmlStr.length) {
             tag += htmlStr[i];
             i++;
           }
           tag += '>';
           buffer += tag;
         } else {
-          if (htmlStr[i] === '\n') {
-            buffer += "<br>";
+          if(htmlStr[i] === '\n') {
+             buffer += "<br>";
           } else {
-            buffer += htmlStr[i];
+             buffer += htmlStr[i];
           }
           i++;
         }
         domText.innerHTML = buffer;
-      }, 25); // 타자 속도 (25ms)
+      }, 20); // 번역 감안해 약간 빠른 타자
     }
 
     verbs.forEach(v => {
       v.addEventListener('click', (e) => {
-        if (isPongActive) return; // 미니게임 중에는 버튼 비활성
-
+        if(isPongActive) return; 
+        
         const action = e.target.getAttribute('data-action');
-
+        currentAction = action; // 언어 토글 시 현재 문맥 유지를 위함
+        
         verbs.forEach(btn => btn.classList.remove('active'));
         e.target.classList.add('active');
 
-        if (action === 'play') {
-          typeLine(scripts.play);
-          setTimeout(startPong, 1500); // 1.5초 뒤 게임 시작
+        if(action === 'play') {
+          typeLine(i18n[currLang].scripts.play);
+          setTimeout(startPong, 1500);
         } else {
-          typeLine(scripts[action]);
+          typeLine(i18n[currLang].scripts[action]);
         }
       });
     });
 
-    // 시작 시 인트로 텍스트 자동 출력
-    typeLine(scripts.intro);
+    // 초기 UI 적용 & 인트로 출력
+    updateUI();
+    typeLine(i18n[currLang].scripts.intro);
 
     // -----------------------------------------------------
-    // 4. 이스터에그: 벡터 스페이스 핑퐁 (Pong Game)
+    // 4. 이스터에그 (벡터 스페이스 핑퐁)
     // -----------------------------------------------------
     const pongCanvas = document.getElementById('pong');
     const pCtx = pongCanvas.getContext('2d');
-    const pongMsg = document.getElementById('pong-msg');
-
+    
     let pWidth = 320, pHeight = 144;
     let paddleW = 4, paddleH = 24;
     let playerY = 60, aiY = 60;
     let ballX = 160, ballY = 72, ballS = 2.5, ballDX = 0, ballDY = 0;
     let pScore = 0, aiScore = 0;
     let pongLoop;
-    let state = 'WAIT'; // 'WAIT' 또는 'PLAY'
+    let state = 'WAIT'; 
 
     function drawPong() {
-      pCtx.fillStyle = "rgba(0,30,0,0.95)"; // 딥 레트로 그린 배경
-      pCtx.fillRect(0, 0, pWidth, pHeight);
-
+      pCtx.fillStyle = "rgba(0,30,0,0.95)"; 
+      pCtx.fillRect(0,0,pWidth,pHeight);
+      
       pCtx.fillStyle = "#fff";
-      // 중앙 네트
-      for (let i = 0; i < pHeight; i += 8) pCtx.fillRect(pWidth / 2 - 1, i, 2, 4);
-
-      // 점수
+      for(let i=0; i<pHeight; i+=8) pCtx.fillRect(pWidth/2 - 1, i, 2, 4);
+      
       pCtx.font = "16px 'VT323'";
-      pCtx.fillText(pScore, pWidth / 4, 20);
-      pCtx.fillText(aiScore, (pWidth / 4) * 3, 20);
-
-      // 패들 및 공
+      pCtx.fillText(pScore, pWidth/4, 20);
+      pCtx.fillText(aiScore, (pWidth/4)*3, 20);
+      
       pCtx.fillRect(10, playerY, paddleW, paddleH);
       pCtx.fillRect(pWidth - 10 - paddleW, aiY, paddleW, paddleH);
       pCtx.fillRect(ballX, ballY, 4, 4);
     }
 
     function updatePong() {
-      if (state !== 'PLAY') return;
+      if(state !== 'PLAY') return;
 
       ballX += ballDX * ballS;
       ballY += ballDY * ballS;
 
-      // 벽 튕기기 (위/아래)
-      if (ballY <= 0 || ballY >= pHeight - 4) ballDY *= -1;
+      if(ballY <= 0 || ballY >= pHeight - 4) ballDY *= -1;
 
-      // 플레이어 패들 충돌
-      if (ballX <= 10 + paddleW && ballY + 4 >= playerY && ballY <= playerY + paddleH && ballDX < 0) {
-        ballDX *= -1.05; // 튕길때마다 약간씩 빨라짐
-        let hitPoint = (ballY - (playerY + paddleH / 2));
-        ballDY = hitPoint * 0.1;
+      // Player Bounce
+      if(ballX <= 10 + paddleW && ballY + 4 >= playerY && ballY <= playerY + paddleH && ballDX < 0) {
+        ballDX *= -1.05; 
+        let hitPoint = (ballY - (playerY + paddleH/2));
+        ballDY = hitPoint * 0.12; 
       }
-
-      // AI 패들 충돌
-      if (ballX + 4 >= pWidth - 10 - paddleW && ballY + 4 >= aiY && ballY <= aiY + paddleH && ballDX > 0) {
+      // AI Bounce
+      if(ballX + 4 >= pWidth - 10 - paddleW && ballY + 4 >= aiY && ballY <= aiY + paddleH && ballDX > 0) {
         ballDX *= -1.05;
-        let hitPoint = (ballY - (aiY + paddleH / 2));
-        ballDY = hitPoint * 0.1;
+        let hitPoint = (ballY - (aiY + paddleH/2));
+        ballDY = hitPoint * 0.12;
       }
 
-      // 멍청하지만 완벽하지 않은 AI 로직
-      if (aiY + paddleH / 2 < ballY - 4) aiY += 1.2;
-      else if (aiY + paddleH / 2 > ballY + 4) aiY -= 1.2;
+      // AI Logic
+      if(aiY + paddleH/2 < ballY - 4) aiY += 1.3;
+      else if(aiY + paddleH/2 > ballY + 4) aiY -= 1.3;
+      
+      if(playerY < 0) playerY = 0; if(playerY > pHeight - paddleH) playerY = pHeight - paddleH;
+      if(aiY < 0) aiY = 0; if(aiY > pHeight - paddleH) aiY = pHeight - paddleH;
 
-      // 패들 화면 밖으로 못나가게 제한
-      if (playerY < 0) playerY = 0; if (playerY > pHeight - paddleH) playerY = pHeight - paddleH;
-      if (aiY < 0) aiY = 0; if (aiY > pHeight - paddleH) aiY = pHeight - paddleH;
-
-      // 득점 처리
-      if (ballX < 0) { aiScore++; resetBall(); }
-      if (ballX > pWidth) { pScore++; resetBall(); }
+      if(ballX < 0) { aiScore++; resetBall(); }
+      if(ballX > pWidth) { pScore++; resetBall(); }
     }
 
     function resetBall() {
-      ballX = pWidth / 2; ballY = pHeight / 2;
+      ballX = pWidth/2; ballY = pHeight/2;
       state = 'WAIT';
-      pongMsg.style.display = 'block';
+      document.getElementById('pong-msg').style.display = 'block';
     }
 
     function runPong() {
       updatePong();
       drawPong();
-      if (isPongActive) pongLoop = requestAnimationFrame(runPong);
+      if(isPongActive) pongLoop = requestAnimationFrame(runPong);
     }
 
     function startPong() {
       isPongActive = true;
       pongCanvas.style.display = 'block';
-      pongMsg.style.display = 'block';
+      document.getElementById('pong-msg').style.display = 'block';
       playerY = 60; aiY = 60; pScore = 0; aiScore = 0; ballS = 2.5;
       resetBall();
       runPong();
     }
-
-    // 키보드 조작 이벤트 리스너
+    
+    // Key Controls
     window.addEventListener('keydown', (e) => {
-      // 1. 방향키로 페이지 스크롤되는 현상 강제 차단
-      if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
-        e.preventDefault();
+      // Prevent scrolling
+      if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+          e.preventDefault();
       }
+      if(!isPongActive) return;
 
-      // 2. 핑퐁 게임 조작
-      if (!isPongActive) return;
-
-      if (state === 'WAIT' && e.code === 'Space') {
+      if(state === 'WAIT' && e.code === 'Space') {
         state = 'PLAY';
-        pongMsg.style.display = 'none';
+        document.getElementById('pong-msg').style.display = 'none';
         ballDX = Math.random() > 0.5 ? 1 : -1;
         ballDY = (Math.random() - 0.5) * 2;
       }
-      if (e.code === 'ArrowUp') playerY -= 20;
-      if (e.code === 'ArrowDown') playerY += 20;
+      if(e.code === 'ArrowUp') playerY -= 20;
+      if(e.code === 'ArrowDown') playerY += 20;
 
-      // 3. 종료 키 (Q 또는 ESC)
-      if (e.key === 'q' || e.key === 'Escape') {
+      if(e.key === 'q' || e.key === 'Escape') {
         isPongActive = false;
         pongCanvas.style.display = 'none';
-        pongMsg.style.display = 'none';
+        document.getElementById('pong-msg').style.display = 'none';
         cancelAnimationFrame(pongLoop);
-        document.getElementById('secret-btn').classList.remove('active');
-        typeLine("Game terminated. The man goes back to coding.");
+        document.getElementById('btn-play').classList.remove('active');
+        typeLine(i18n[currLang].scripts.pongExit); // 다국어 종료 메세지
       }
     });
 
   </script>
 </body>
-
 </html>
