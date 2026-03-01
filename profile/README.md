@@ -1,16 +1,13 @@
-## Hi there 👋
+[![The Lost Map — Intro](./images/intro_bitmap.svg)](https://redsunjin.github.io/.github/index.html)
 
-<!--
-**redsunjin/.github** is a ✨ _special_ ✨ repository because its `profile/README.md` (this file) appears on your GitHub profile.
+# Hello — I'm redsunjin
 
-Here are some ideas to get you started:
+Builder of retro tools and vector worlds.  
+Click the banner to open an interactive 80s-style intro with retro beeps.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+## Projects (in progress)
+- atlas-engine — Procedural map engine (WIP)
+- retro-ui — Terminal retro UI POC
+- docs-hub — Central docs aggregator
+
+(Secret hints available in the intro — look for repositories starting with `atlas-`.)
