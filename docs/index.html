@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <title>The Builder's Tale</title>
@@ -46,25 +47,30 @@
     canvas#scene {
       width: 100%;
       height: 100%;
-      image-rendering: pixelated; /* 도트 렌더링 유지 */
+      image-rendering: pixelated;
+      /* 도트 렌더링 유지 */
     }
 
     /* 이스터에그 핑퐁 UI 캔버스 (평소엔 숨김) */
     canvas#pong {
       display: none;
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.95);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
       z-index: 10;
     }
-    
+
     #pong-msg {
       display: none;
       position: absolute;
-      top: 50%; width: 100%;
+      top: 50%;
+      width: 100%;
       text-align: center;
-      color: #fff; z-index: 11;
+      color: #fff;
+      z-index: 11;
       font-size: 28px;
       text-shadow: 2px 2px #f00;
       transform: translateY(-50%);
@@ -95,7 +101,9 @@
       cursor: pointer;
       text-align: center;
     }
-    .verb:hover, .verb.active {
+
+    .verb:hover,
+    .verb.active {
       color: #fff;
       text-decoration: underline;
     }
@@ -105,37 +113,78 @@
       width: 70%;
       padding: 20px;
       box-sizing: border-box;
-      color: #5cf; /* 고전 루카스아츠 UI 블루 텍스트 */
+      color: #5cf;
+      /* 고전 루카스아츠 UI 블루 텍스트 */
       line-height: 1.4;
       overflow-y: auto;
     }
-    
+
     /* 텍스트 내부 꾸밈 */
-    .text-title { color: #fff; display:block; margin-bottom:12px; font-size: 28px; border-bottom: 2px dashed #5cf; padding-bottom:5px;}
-    .text-item { margin-bottom: 10px; display:block; }
-    .text-link { color: #f55; text-decoration: none; border-bottom: 1px dotted #f55; cursor: pointer; }
-    .text-link:hover { color: #fff; border-bottom: 1px solid #fff; }
-    .text-highlight { color: #fe0; }
+    .text-title {
+      color: #fff;
+      display: block;
+      margin-bottom: 12px;
+      font-size: 28px;
+      border-bottom: 2px dashed #5cf;
+      padding-bottom: 5px;
+    }
+
+    .text-item {
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .text-link {
+      color: #f55;
+      text-decoration: none;
+      border-bottom: 1px dotted #f55;
+      cursor: pointer;
+    }
+
+    .text-link:hover {
+      color: #fff;
+      border-bottom: 1px solid #fff;
+    }
+
+    .text-highlight {
+      color: #fe0;
+    }
 
     /* 커서 타이핑 효과 점 */
     .cursor {
       display: inline-block;
-      width: 12px; height: 20px;
+      width: 12px;
+      height: 20px;
       background: #5cf;
       vertical-align: bottom;
       animation: blink 1s step-end infinite;
     }
 
-    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
 
     /* 감동을 주는 상단 문구 */
-    .title-banner { margin-top:30px; font-size: 32px; letter-spacing: 2px; text-align: center; color: #fff;}
-    .subtitle { font-size: 18px; color: #aaa; margin-top:5px;}
+    .title-banner {
+      margin-top: 30px;
+      font-size: 32px;
+      letter-spacing: 2px;
+      text-align: center;
+      color: #fff;
+    }
 
+    .subtitle {
+      font-size: 18px;
+      color: #aaa;
+      margin-top: 5px;
+    }
   </style>
 </head>
+
 <body>
-  
+
   <div class="title-banner">The Builder's Tale</div>
   <div class="subtitle">"Ordinary lines of code form extraordinary worlds."</div>
 
@@ -143,12 +192,13 @@
     <div id="viewport">
       <!-- 배경 애니메이션 캔버스 -->
       <canvas id="scene" width="320" height="144"></canvas>
-      
+
       <!-- 비밀 핑퐁 게임 캔버스 -->
       <canvas id="pong" width="320" height="144"></canvas>
-      <div id="pong-msg">PRESS SPACE TO SERVE<br><span style="font-size:16px;">(Arrow Keys to move, Q to quit)</span></div>
+      <div id="pong-msg">PRESS SPACE TO SERVE<br><span style="font-size:16px;">(Arrow Keys to move, Q to quit)</span>
+      </div>
     </div>
-    
+
     <div id="action-panel">
       <!-- 동작 명령어 목록 -->
       <div id="verbs">
@@ -157,7 +207,7 @@
         <div class="verb" data-action="open">Open Drawer</div>
         <div class="verb" data-action="play" id="secret-btn" style="color:#333;">Play</div>
       </div>
-      
+
       <!-- 결과 텍스트 출력창 -->
       <div id="dialogue">
         <span id="text-content"></span><span class="cursor" id="cursor"></span>
@@ -172,7 +222,7 @@
     const scripts = {
       default: "What should I do? It is quiet here...\nThe gentle glow of the monitor is the only light.",
       intro: "It is late at night. The office is empty.\nA tired worker stares at the glowing screen.\nHe is not casting spells, nor slaying dragons...\n\nHe is just laying down simple blocks of code, one by one.\nAnd yet... in the vector space inside the machine,\nentire worlds are being built.",
-      examine: "<span class='text-title'>[ Public Projects : The Architect's Desk ]</span><span class='text-item'>- <a class='text-link'>atlas-engine</a> : A procedural map engine for vector spaces (WIP). This is the foundation block.</span><span class='text-item'>- <a class='text-link'>retro-ui</a> : A terminal retro UI Proof-of-Concept.</span><span class='text-item'>- <a class='text-link'>docs-hub</a> : Central documentation aggregator backbone.</span>\nThese structures are small, but they hold the sky up.",
+      examine: "<span class='text-title'>[ Public Projects : The Architect's Desk ]</span><span class='text-item'>- <a href='https://github.com/redsunjin/maestro-coding' target='_blank' class='text-link'>maestro-coding</a> : AI 에이전트와 함께하는 코드 심포니 🎼</span><span class='text-item'>- <a href='https://github.com/redsunjin/trunk_rag' target='_blank' class='text-link'>trunk_rag</a> : 폐쇄망/로컬 환경에서 사용하는 경량 RAG.</span><span class='text-item'>- <a href='https://github.com/redsunjin/OpenCourse-TTS-Helper' target='_blank' class='text-link'>OpenCourse-TTS-Helper</a> : 온라인 학습 스크립트 기반 브라우저 확장.</span>\nThese structures are small, but they hold the sky up.",
       open: "You slowly open the locked drawer. The mist of <span class='text-highlight'>Private Repositories</span> spills out.\nYou can barely make out shapes of future monoliths.\nHidden modules. Unreleased architectures.\n\n<span style='color:#777;'>Hint: Focus on the 'atlas' prefixes in the public domain.</span>\nThe drawer closes before you see too much.",
       play: "Wait... a strange program executes..."
     };
@@ -183,18 +233,18 @@
     // -----------------------------------------------------
     const sceneCanvas = document.getElementById('scene');
     const ctx = sceneCanvas.getContext('2d');
-    
+
     function drawScene(frame) {
       // Background (Dark room)
       ctx.fillStyle = "#000";
       ctx.fillRect(0, 0, 320, 144);
-      
+
       // Window on the wall
       ctx.fillStyle = "#222";
       ctx.fillRect(220, 20, 80, 80);
-      
+
       // The Monitor (Gateway to vector space)
-      const glowStr = Math.floor((Math.sin(frame * 0.05) * 0.5 + 0.5) * 40); 
+      const glowStr = Math.floor((Math.sin(frame * 0.05) * 0.5 + 0.5) * 40);
       ctx.fillStyle = `rgb(10, ${60 + glowStr}, ${30 + glowStr})`; // vector green glow
       ctx.fillRect(60, 40, 100, 70);
 
@@ -202,27 +252,27 @@
       ctx.fillStyle = "#ccc";
       ctx.fillRect(58, 38, 2, 74); ctx.fillRect(160, 38, 2, 74); // monitor sides
       ctx.fillRect(58, 38, 104, 2); ctx.fillRect(58, 110, 104, 2); // monitor top/bottom
-      
+
       ctx.fillRect(0, 130, 320, 2); // desk surface
       ctx.fillRect(30, 132, 160, 12); // desk thick
-      
+
       // Character Silhouette (The Ordinary Guy)
       ctx.fillStyle = "#aaa";
       ctx.fillRect(110, 70, 16, 18); // Head
       ctx.fillRect(100, 88, 30, 42); // Body
-      
+
       // Simple typing arm animation (2 frames)
-      if(frame % 30 < 15) {
+      if (frame % 30 < 15) {
         ctx.fillRect(80, 105, 20, 4); // Arm up
       } else {
         ctx.fillRect(80, 112, 20, 4); // Arm down
       }
-      
+
       // Keyboard
       ctx.fillStyle = "#666";
       ctx.fillRect(60, 126, 30, 4);
     }
-    
+
     let sceneFrame = 0;
     setInterval(() => { drawScene(sceneFrame++); }, 100);
 
@@ -235,32 +285,32 @@
     let isPongActive = false;
 
     function typeLine(htmlStr) {
-      if(typeTimer) clearInterval(typeTimer);
+      if (typeTimer) clearInterval(typeTimer);
       domText.innerHTML = "";
-      
+
       let i = 0;
       let buffer = "";
-      
+
       typeTimer = setInterval(() => {
-        if(i >= htmlStr.length) {
+        if (i >= htmlStr.length) {
           clearInterval(typeTimer);
           return;
         }
-        
+
         // HTML 태그는 한 번에 출력되도록 처리
-        if(htmlStr[i] === '<') {
+        if (htmlStr[i] === '<') {
           let tag = "";
-          while(htmlStr[i] !== '>' && i < htmlStr.length) {
+          while (htmlStr[i] !== '>' && i < htmlStr.length) {
             tag += htmlStr[i];
             i++;
           }
           tag += '>';
           buffer += tag;
         } else {
-          if(htmlStr[i] === '\n') {
-             buffer += "<br>";
+          if (htmlStr[i] === '\n') {
+            buffer += "<br>";
           } else {
-             buffer += htmlStr[i];
+            buffer += htmlStr[i];
           }
           i++;
         }
@@ -270,14 +320,14 @@
 
     verbs.forEach(v => {
       v.addEventListener('click', (e) => {
-        if(isPongActive) return; // 미니게임 중에는 버튼 비활성
-        
+        if (isPongActive) return; // 미니게임 중에는 버튼 비활성
+
         const action = e.target.getAttribute('data-action');
-        
+
         verbs.forEach(btn => btn.classList.remove('active'));
         e.target.classList.add('active');
 
-        if(action === 'play') {
+        if (action === 'play') {
           typeLine(scripts.play);
           setTimeout(startPong, 1500); // 1.5초 뒤 게임 시작
         } else {
@@ -295,7 +345,7 @@
     const pongCanvas = document.getElementById('pong');
     const pCtx = pongCanvas.getContext('2d');
     const pongMsg = document.getElementById('pong-msg');
-    
+
     let pWidth = 320, pHeight = 144;
     let paddleW = 4, paddleH = 24;
     let playerY = 60, aiY = 60;
@@ -306,17 +356,17 @@
 
     function drawPong() {
       pCtx.fillStyle = "rgba(0,30,0,0.95)"; // 딥 레트로 그린 배경
-      pCtx.fillRect(0,0,pWidth,pHeight);
-      
+      pCtx.fillRect(0, 0, pWidth, pHeight);
+
       pCtx.fillStyle = "#fff";
       // 중앙 네트
-      for(let i=0; i<pHeight; i+=8) pCtx.fillRect(pWidth/2 - 1, i, 2, 4);
-      
+      for (let i = 0; i < pHeight; i += 8) pCtx.fillRect(pWidth / 2 - 1, i, 2, 4);
+
       // 점수
       pCtx.font = "16px 'VT323'";
-      pCtx.fillText(pScore, pWidth/4, 20);
-      pCtx.fillText(aiScore, (pWidth/4)*3, 20);
-      
+      pCtx.fillText(pScore, pWidth / 4, 20);
+      pCtx.fillText(aiScore, (pWidth / 4) * 3, 20);
+
       // 패들 및 공
       pCtx.fillRect(10, playerY, paddleW, paddleH);
       pCtx.fillRect(pWidth - 10 - paddleW, aiY, paddleW, paddleH);
@@ -324,43 +374,43 @@
     }
 
     function updatePong() {
-      if(state !== 'PLAY') return;
+      if (state !== 'PLAY') return;
 
       ballX += ballDX * ballS;
       ballY += ballDY * ballS;
 
       // 벽 튕기기 (위/아래)
-      if(ballY <= 0 || ballY >= pHeight - 4) ballDY *= -1;
+      if (ballY <= 0 || ballY >= pHeight - 4) ballDY *= -1;
 
       // 플레이어 패들 충돌
-      if(ballX <= 10 + paddleW && ballY + 4 >= playerY && ballY <= playerY + paddleH && ballDX < 0) {
+      if (ballX <= 10 + paddleW && ballY + 4 >= playerY && ballY <= playerY + paddleH && ballDX < 0) {
         ballDX *= -1.05; // 튕길때마다 약간씩 빨라짐
-        let hitPoint = (ballY - (playerY + paddleH/2));
+        let hitPoint = (ballY - (playerY + paddleH / 2));
         ballDY = hitPoint * 0.1;
       }
-      
+
       // AI 패들 충돌
-      if(ballX + 4 >= pWidth - 10 - paddleW && ballY + 4 >= aiY && ballY <= aiY + paddleH && ballDX > 0) {
+      if (ballX + 4 >= pWidth - 10 - paddleW && ballY + 4 >= aiY && ballY <= aiY + paddleH && ballDX > 0) {
         ballDX *= -1.05;
-        let hitPoint = (ballY - (aiY + paddleH/2));
+        let hitPoint = (ballY - (aiY + paddleH / 2));
         ballDY = hitPoint * 0.1;
       }
 
       // 멍청하지만 완벽하지 않은 AI 로직
-      if(aiY + paddleH/2 < ballY - 4) aiY += 1.2;
-      else if(aiY + paddleH/2 > ballY + 4) aiY -= 1.2;
-      
+      if (aiY + paddleH / 2 < ballY - 4) aiY += 1.2;
+      else if (aiY + paddleH / 2 > ballY + 4) aiY -= 1.2;
+
       // 패들 화면 밖으로 못나가게 제한
-      if(playerY < 0) playerY = 0; if(playerY > pHeight - paddleH) playerY = pHeight - paddleH;
-      if(aiY < 0) aiY = 0; if(aiY > pHeight - paddleH) aiY = pHeight - paddleH;
+      if (playerY < 0) playerY = 0; if (playerY > pHeight - paddleH) playerY = pHeight - paddleH;
+      if (aiY < 0) aiY = 0; if (aiY > pHeight - paddleH) aiY = pHeight - paddleH;
 
       // 득점 처리
-      if(ballX < 0) { aiScore++; resetBall(); }
-      if(ballX > pWidth) { pScore++; resetBall(); }
+      if (ballX < 0) { aiScore++; resetBall(); }
+      if (ballX > pWidth) { pScore++; resetBall(); }
     }
 
     function resetBall() {
-      ballX = pWidth/2; ballY = pHeight/2;
+      ballX = pWidth / 2; ballY = pHeight / 2;
       state = 'WAIT';
       pongMsg.style.display = 'block';
     }
@@ -368,7 +418,7 @@
     function runPong() {
       updatePong();
       drawPong();
-      if(isPongActive) pongLoop = requestAnimationFrame(runPong);
+      if (isPongActive) pongLoop = requestAnimationFrame(runPong);
     }
 
     function startPong() {
@@ -379,28 +429,28 @@
       resetBall();
       runPong();
     }
-    
+
     // 키보드 조작 이벤트 리스너
     window.addEventListener('keydown', (e) => {
       // 1. 방향키로 페이지 스크롤되는 현상 강제 차단
-      if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
-          e.preventDefault();
+      if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
+        e.preventDefault();
       }
 
       // 2. 핑퐁 게임 조작
-      if(!isPongActive) return;
+      if (!isPongActive) return;
 
-      if(state === 'WAIT' && e.code === 'Space') {
+      if (state === 'WAIT' && e.code === 'Space') {
         state = 'PLAY';
         pongMsg.style.display = 'none';
         ballDX = Math.random() > 0.5 ? 1 : -1;
         ballDY = (Math.random() - 0.5) * 2;
       }
-      if(e.code === 'ArrowUp') playerY -= 20;
-      if(e.code === 'ArrowDown') playerY += 20;
+      if (e.code === 'ArrowUp') playerY -= 20;
+      if (e.code === 'ArrowDown') playerY += 20;
 
       // 3. 종료 키 (Q 또는 ESC)
-      if(e.key === 'q' || e.key === 'Escape') {
+      if (e.key === 'q' || e.key === 'Escape') {
         isPongActive = false;
         pongCanvas.style.display = 'none';
         pongMsg.style.display = 'none';
@@ -412,4 +462,5 @@
 
   </script>
 </body>
+
 </html>
