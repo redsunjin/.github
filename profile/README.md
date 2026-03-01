@@ -15,7 +15,7 @@ Here are the monoliths I'm currently laying bricks for:
 > **[ 🔍 View More Public Repositories ](https://github.com/redsunjin?tab=repositories)**
 
 <details>
-<summary>🌫️ The Fog of War (Private)</summary>
+<summary>📂 Closed Drawers (Private)</summary>
 <br>
-<i>Hidden structures lie deep in the mist. Focus your eyes on the <code>atlas-</code> structures. You might find a secret... or a game.</i>
+<i>Just a few messy drafts and quiet experiments. Though occasionally, a tiny secret slips out around the <code>atlas-</code> projects.</i>
 </details>
