@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://redsunjin.github.io/.github/index.html">
-    <img src="banner.svg" alt="Enter The Builder's Tale" width="400">
+    <img src="https://raw.githubusercontent.com/redsunjin/.github/main/profile/banner.svg" alt="Enter The Builder's Tale" width="400">
   </a>
 </p>
 
