@@ -2,9 +2,11 @@
 
 **An ordinary builder weaving code in the vector space.**
 
-> 🕹️ **[ Enter The Builder's Tale ](https://redsunjin.github.io/.github/index.html)**
-> 
-> *Click the link above to explore an interactive 90s-style adventure of everyday creation.*
+<p align="center">
+  <a href="https://redsunjin.github.io/.github/index.html">
+    <img src="banner.svg" alt="Enter The Builder's Tale" width="400">
+  </a>
+</p>
 
 ## 🔨 Construction Sites (Public)
 Here are the monoliths I'm currently laying bricks for:

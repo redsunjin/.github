@@ -235,6 +235,44 @@
       margin-top: 5px;
     }
 
+    /* 모바일 가상 컨트롤러 (핑퐁용) */
+    #virtual-pad {
+      display: none;
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      justify-content: space-between;
+      padding: 0 15px;
+      z-index: 20;
+    }
+
+    .v-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .v-btn {
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      color: #fff;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+    }
+
+    .v-btn:active {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
     /* 모바일 반응형 (화면 폭 650px 이하일 때 제목 겹침 방지) */
     @media (max-width: 650px) {
       body {
@@ -268,9 +306,24 @@
     <div id="viewport">
       <canvas id="scene" width="320" height="144"></canvas>
       <canvas id="pong" width="320" height="144"></canvas>
-      <div id="pong-msg" id="pongMsgDisplay">PRESS SPACE TO SERVE<br><span style="font-size:16px;">(Arrow Keys to
-          move,
+      <div id="pong-msg" id="pongMsgDisplay">PRESS SPACE TO SERVE<br><span style="font-size:16px;">(Arrow Keys to move,
           Q to quit)</span></div>
+
+      <!-- 모바일 가상 패드 -->
+      <div id="virtual-pad">
+        <div class="v-btn-group">
+          <div class="v-btn" id="v-up">UP</div>
+          <div class="v-btn" id="v-down">DWN</div>
+        </div>
+        <div class="v-btn-group" style="align-items: flex-end;">
+          <div class="v-btn" id="v-space" style="background: rgba(255,200,0,0.15); border-color: rgba(255,200,0,0.5);">
+            SPC</div>
+          <div class="v-btn" id="v-q"
+            style="background: rgba(255,50,50,0.15); border-color: rgba(255,50,50,0.5); width:36px; height:36px; font-size:16px;">
+            QUIT</div>
+        </div>
+      </div>
+
     </div>
     <div id="action-panel">
       <div id="verbs">
@@ -583,6 +636,7 @@
 
     function startPong() {
       isPongActive = true; pongCanvas.style.display = 'block'; document.getElementById('pong-msg').style.display = 'block';
+      if (window.innerWidth <= 650) document.getElementById('virtual-pad').style.display = 'flex';
       playerY = 60; aiY = 60; pScore = 0; aiScore = 0; ballS = 2.5;
       resetBall(); runPong();
     }
@@ -597,10 +651,31 @@
       if (e.code === 'ArrowUp') playerY -= 20; if (e.code === 'ArrowDown') playerY += 20;
       if (e.key === 'q' || e.key === 'Escape') {
         isPongActive = false; pongCanvas.style.display = 'none'; document.getElementById('pong-msg').style.display = 'none';
+        document.getElementById('virtual-pad').style.display = 'none';
         cancelAnimationFrame(pongLoop); document.getElementById('btn-play').classList.remove('active');
         typeLine(i18n[currLang].scripts.pongExit);
       }
     });
+
+    // 모바일 터치 이벤트 바인딩
+    function vPress(key) {
+      if (!isPongActive) return;
+      if (state === 'WAIT' && key === 'Space') {
+        state = 'PLAY'; document.getElementById('pong-msg').style.display = 'none';
+        ballDX = Math.random() > 0.5 ? 1 : -1; ballDY = (Math.random() - 0.5) * 2;
+      }
+      if (key === 'ArrowUp') playerY -= 20; if (key === 'ArrowDown') playerY += 20;
+      if (key === 'q') {
+        isPongActive = false; pongCanvas.style.display = 'none'; document.getElementById('pong-msg').style.display = 'none';
+        document.getElementById('virtual-pad').style.display = 'none';
+        cancelAnimationFrame(pongLoop); document.getElementById('btn-play').classList.remove('active');
+        typeLine(i18n[currLang].scripts.pongExit);
+      }
+    }
+    document.getElementById('v-up').addEventListener('touchstart', (e) => { e.preventDefault(); vPress('ArrowUp'); });
+    document.getElementById('v-down').addEventListener('touchstart', (e) => { e.preventDefault(); vPress('ArrowDown'); });
+    document.getElementById('v-space').addEventListener('touchstart', (e) => { e.preventDefault(); vPress('Space'); });
+    document.getElementById('v-q').addEventListener('touchstart', (e) => { e.preventDefault(); vPress('q'); });
   </script>
 </body>
 
