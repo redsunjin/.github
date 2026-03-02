@@ -252,6 +252,19 @@
       flex-direction: column;
       gap: 8px;
       justify-content: flex-end;
+      align-items: center;
+    }
+
+    .v-dpad {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .v-dpad-row {
+      display: flex;
+      gap: 4px;
     }
 
     .v-btn {
@@ -309,15 +322,15 @@
       <div id="pong-msg" id="pongMsgDisplay">PRESS SPACE TO SERVE<br><span style="font-size:16px;">(Arrow Keys to move,
           Q to quit)</span></div>
 
-      <!-- 모바일 가상 패드 -->
+      <!-- 모바일 가상 패드 (핑퐁 전용 상/하 액션버튼) -->
       <div id="virtual-pad">
         <div class="v-btn-group">
           <div class="v-btn" id="v-up">UP</div>
           <div class="v-btn" id="v-down">DWN</div>
         </div>
-        <div class="v-btn-group" style="align-items: flex-end;">
+        <div class="v-btn-group" style="align-items: flex-end; margin-bottom: 20px;">
           <div class="v-btn" id="v-space" style="background: rgba(255,200,0,0.15); border-color: rgba(255,200,0,0.5);">
-            SPC</div>
+            ACT</div>
           <div class="v-btn" id="v-q"
             style="background: rgba(255,50,50,0.15); border-color: rgba(255,50,50,0.5); width:36px; height:36px; font-size:16px;">
             QUIT</div>
@@ -352,7 +365,8 @@
         btnExamine: "Examine (Public)",
         btnOpen: "Open (Private)",
         btnPlay: "Play",
-        pongMsg: "PRESS SPACE TO SERVE<br><span style='font-size:16px;'>(Arrow Keys to move, Q to quit)</span>",
+        pongMsg: "PONG (Retro)<br>PRESS SPACE TO SERVE<br><span style='font-size:16px;'>(Arrow Keys to move, Q to quit)</span>",
+        hockeyMsg: "AIR HOCKEY (Neon)<br>PRESS SPACE TO START<br><span style='font-size:16px;'>(4-Way arrows to move, Q to quit)</span>",
         scripts: {
           default: "What should I do? It is quiet here...\nThe gentle glow of the monitor is the only light.",
           intro: "It is late at night. The office is empty.\nA tired worker stares at the glowing screen.\nHe is not casting spells, nor slaying dragons...\n\nHe is just laying down simple blocks of code, one by one.\nAnd yet... in the vector space inside the machine,\nentire worlds are being built.",
@@ -370,7 +384,8 @@
         btnExamine: "살펴본다 (Public)",
         btnOpen: "열어본다 (Private)",
         btnPlay: "즐긴다",
-        pongMsg: "서브하려면 스페이스바를 누르세요<br><span style='font-size:16px;'>(방향키: 이동, Q: 종료)</span>",
+        pongMsg: "고전 핑퐁 (PONG)<br>서브하려면 스페이스바<br><span style='font-size:16px;'>(상하 이동: 방향키, 종료: Q)</span>",
+        hockeyMsg: "에어 하키 (AIR HOCKEY)<br>시작하려면 스페이스바<br><span style='font-size:16px;'>(4방향 이동: 방향키, 종료: Q)</span>",
         scripts: {
           default: "무엇을 해야 할까? 사방이 고요하다...\n오직 모니터의 희미한 불빛만이 공간을 채운다.",
           intro: "늦은 밤, 텅 빈 사무실.\n피곤에 지친 직장인이 빛나는 화면을 응시하고 있다.\n그는 마법을 부리거나 드래곤과 싸우지 않는다...\n\n그저 평범한 코드 블록들을 묵묵히 하나씩 쌓아 올릴 뿐이다.\n그러나... 기계 안의 벡터 스페이스에서는,\n어느새 거대한 세계가 지어지고 있다.",
@@ -580,7 +595,7 @@
         e.target.classList.add('active');
 
         if (action === 'play') {
-          typeLine(i18n[currLang].scripts.play); setTimeout(startPong, 1500);
+          typeLine(i18n[currLang].scripts.play); setTimeout(startMinigame, 1500);
         } else {
           typeLine(i18n[currLang].scripts[action]);
         }
@@ -590,13 +605,26 @@
     updateUI(); typeLine(i18n[currLang].scripts.intro);
 
     // -----------------------------------------------------
-    // 핑퐁 미니게임
+    // 미니게임 상태 및 분기 (PONG vs AIR HOCKEY)
     // -----------------------------------------------------
     const pongCanvas = document.getElementById('pong');
     const pCtx = pongCanvas.getContext('2d');
     let pWidth = 320, pHeight = 144, paddleW = 4, paddleH = 24;
     let playerY = 60, aiY = 60, ballX = 160, ballY = 72, ballS = 2.5, ballDX = 0, ballDY = 0;
     let pScore = 0, aiScore = 0, pongLoop, state = 'WAIT';
+    let currentGameType = 'PONG'; // 'PONG' or 'HOCKEY'
+
+    // 키보드 전방향 동시 입력 처리를 위한 맵
+    const keysMap = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
+
+    // 에어하키 전용 변수 (말의 반경, 마우스 포인터)
+    let hPlayerX = 40, hPlayerY = 72, hAiX = 280, hAiY = 72, hRadius = 14;
+    let pkX = 160, pkY = 72, pkRadius = 10, hGoalSize = 60;
+
+    // 마우스/터치 드래그 상태
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
 
     function drawPong() {
       pCtx.fillStyle = "rgba(0,30,0,0.95)"; pCtx.fillRect(0, 0, pWidth, pHeight);
@@ -626,29 +654,140 @@
     }
 
     function resetBall() {
-      ballX = pWidth / 2; ballY = pHeight / 2; state = 'WAIT';
+      ballX = pWidth / 2; ballY = pHeight / 2; pkX = pWidth / 2; pkY = pHeight / 2; state = 'WAIT';
       document.getElementById('pong-msg').style.display = 'block';
     }
 
-    function runPong() {
-      updatePong(); drawPong(); if (isPongActive) pongLoop = requestAnimationFrame(runPong);
+    // --- [에어하키(Air Hockey) 렌더링 및 물리 로직] --- //
+    function drawHockey() {
+      // 코트 바닥 및 라인
+      pCtx.fillStyle = "rgba(4, 8, 20, 0.95)"; pCtx.fillRect(0, 0, pWidth, pHeight);
+      pCtx.strokeStyle = "rgba(0, 200, 255, 0.4)"; pCtx.lineWidth = 2;
+      pCtx.strokeRect(4, 4, pWidth - 8, pHeight - 8); // 테두리
+      pCtx.beginPath(); pCtx.moveTo(pWidth / 2, 4); pCtx.lineTo(pWidth / 2, pHeight - 4); pCtx.stroke(); // 센터 라인
+      pCtx.beginPath(); pCtx.arc(pWidth / 2, pHeight / 2, 20, 0, Math.PI * 2); pCtx.stroke(); // 센터 서클
+
+      // 골대 표기 (벽면 일부분)
+      pCtx.fillStyle = "#ff4040"; pCtx.fillRect(0, pHeight / 2 - hGoalSize / 2, 6, hGoalSize);
+      pCtx.fillStyle = "#4080ff"; pCtx.fillRect(pWidth - 6, pHeight / 2 - hGoalSize / 2, 6, hGoalSize);
+
+      // 점수
+      pCtx.fillStyle = "#fff"; pCtx.font = "16px 'VT323'"; pCtx.fillText(pScore, pWidth / 4, 20); pCtx.fillText(aiScore, (pWidth / 4) * 3, 20);
+
+      // 둥근 퍽 (Puck)
+      pCtx.beginPath(); pCtx.arc(pkX, pkY, pkRadius, 0, Math.PI * 2);
+      pCtx.fillStyle = "#fffd82"; pCtx.fill(); pCtx.closePath();
+
+      // 플레이어 말 (Red)
+      pCtx.beginPath(); pCtx.arc(hPlayerX, hPlayerY, hRadius, 0, Math.PI * 2);
+      pCtx.fillStyle = "#ff2a2a"; pCtx.fill(); pCtx.strokeStyle = "#ffa5a5"; pCtx.lineWidth = 2; pCtx.stroke();
+
+      // AI 말 (Blue)
+      pCtx.beginPath(); pCtx.arc(hAiX, hAiY, hRadius, 0, Math.PI * 2);
+      pCtx.fillStyle = "#3377ff"; pCtx.fill(); pCtx.strokeStyle = "#a5c5ff"; pCtx.stroke();
     }
 
-    function startPong() {
-      isPongActive = true; pongCanvas.style.display = 'block'; document.getElementById('pong-msg').style.display = 'block';
+    function moveHockeyPlayer() {
+      let speed = 4;
+      if (keysMap.ArrowUp) hPlayerY -= speed;
+      if (keysMap.ArrowDown) hPlayerY += speed;
+      if (keysMap.ArrowLeft) hPlayerX -= speed;
+      if (keysMap.ArrowRight) hPlayerX += speed;
+
+      // 움직임 제한 (내 진영 안에서 둥근 반경 고려)
+      if (hPlayerX - hRadius < 4) hPlayerX = hRadius + 4;
+      if (hPlayerX + hRadius > pWidth / 2 - 2) hPlayerX = pWidth / 2 - 2 - hRadius; // 중앙선 제한
+      if (hPlayerY - hRadius < 4) hPlayerY = hRadius + 4;
+      if (hPlayerY + hRadius > pHeight - 4) hPlayerY = pHeight - 4 - hRadius;
+    }
+
+    // 두 원의 충돌 체크 및 반사 벡터 계산
+    function resolveCircleCollision(pX, pY, r1, bX, bY, r2, m) {
+      let dx = bX - pX; let dy = bY - pY;
+      let dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < r1 + r2) {
+        // 충돌 시 밀어내기 방향 정규화
+        let nx = dx / dist; let ny = dy / dist;
+        // 말의 중심에서 멀어지는 힘(타격감 부여)
+        ballDX = nx * m; ballDY = ny * m;
+        // 겹침 바로잡아주기 (Sticking 방지)
+        let overlap = (r1 + r2) - dist;
+        pkX += nx * overlap; pkY += ny * overlap;
+      }
+    }
+
+    function updateHockey() {
+      if (state !== 'PLAY') return;
+      moveHockeyPlayer();
+
+      // 퍽(Puck) 이동 (마찰로 서서히 느려지지 않고 에어하키 특유의 활주 유지)
+      pkX += ballDX * ballS; pkY += ballDY * ballS;
+
+      // 위/아래 벽 바운스
+      if (pkY - pkRadius <= 4) { ballDY *= -1; pkY = 4 + pkRadius; }
+      else if (pkY + pkRadius >= pHeight - 4) { ballDY *= -1; pkY = pHeight - 4 - pkRadius; }
+
+      // 골대 좌/우 벽 바운스 vs 득점 판정
+      if (pkX - pkRadius <= 4) {
+        if (pkY > pHeight / 2 - hGoalSize / 2 && pkY < pHeight / 2 + hGoalSize / 2) { aiScore++; resetBall(); }
+        else { ballDX *= -1; pkX = 4 + pkRadius; }
+      }
+      else if (pkX + pkRadius >= pWidth - 4) {
+        if (pkY > pHeight / 2 - hGoalSize / 2 && pkY < pHeight / 2 + hGoalSize / 2) { pScore++; resetBall(); }
+        else { ballDX *= -1; pkX = pWidth - 4 - pkRadius; }
+      }
+
+      // 플레이어 및 AI 말과의 원형 물리 충돌
+      resolveCircleCollision(hPlayerX, hPlayerY, hRadius, pkX, pkY, pkRadius, 1.3);
+      resolveCircleCollision(hAiX, hAiY, hRadius, pkX, pkY, pkRadius, 1.1);
+
+      // AI 움직임 (퍽을 수비/타격)
+      if (pkY < hAiY) hAiY -= 1.8; else if (pkY > hAiY) hAiY += 1.8;
+      // 중앙선 못 넘게 & 앞뒤 무빙
+      if (pkX > pWidth / 2 && pkX < pWidth - 40) { // 우리 진영에 왔을 때 마중나가 타격
+        if (pkX < hAiX) hAiX -= 1.5; else hAiX += 1.5;
+      } else { // 기본 수비 위치 복귀
+        if (hAiX > pWidth - 30) hAiX -= 1.0; else if (hAiX < pWidth - 30) hAiX += 1.0;
+      }
+      // AI 제한 구역
+      if (hAiX - hRadius < pWidth / 2 + 2) hAiX = pWidth / 2 + 2 + hRadius;
+      if (hAiX + hRadius > pWidth - 4) hAiX = pWidth - 4 - hRadius;
+      if (hAiY - hRadius < 4) hAiY = hRadius + 4;
+      if (hAiY + hRadius > pHeight - 4) hAiY = pHeight - 4 - hRadius;
+    }
+
+    function runMinigame() {
+      if (currentGameType === 'PONG') { updatePong(); drawPong(); }
+      else { updateHockey(); drawHockey(); }
+
+      if (isPongActive) pongLoop = requestAnimationFrame(runMinigame);
+    }
+
+    function startMinigame() {
+      isPongActive = true;
+      currentGameType = (Math.random() > 0.5) ? 'PONG' : 'HOCKEY';
+      document.getElementById('pong-msg').innerHTML = (currentGameType === 'PONG') ? i18n[currLang].pongMsg : i18n[currLang].hockeyMsg;
+      pongCanvas.style.display = 'block'; document.getElementById('pong-msg').style.display = 'block';
       if (window.innerWidth <= 650) document.getElementById('virtual-pad').style.display = 'flex';
+
       playerY = 60; aiY = 60; pScore = 0; aiScore = 0; ballS = 2.5;
-      resetBall(); runPong();
+      hPlayerX = 20; hPlayerY = 72; hAiX = 300; hAiY = 72;
+      resetBall(); runMinigame();
     }
 
     window.addEventListener('keydown', (e) => {
-      if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) e.preventDefault();
+      if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
+        e.preventDefault(); keysMap[e.code] = true;
+      }
       if (!isPongActive) return;
       if (state === 'WAIT' && e.code === 'Space') {
         state = 'PLAY'; document.getElementById('pong-msg').style.display = 'none';
         ballDX = Math.random() > 0.5 ? 1 : -1; ballDY = (Math.random() - 0.5) * 2;
       }
-      if (e.code === 'ArrowUp') playerY -= 20; if (e.code === 'ArrowDown') playerY += 20;
+      // 핑퐁용 구형 단순 이동 컨트롤 (상속 유지)
+      if (currentGameType === 'PONG') {
+        if (e.code === 'ArrowUp') playerY -= 20; if (e.code === 'ArrowDown') playerY += 20;
+      }
       if (e.key === 'q' || e.key === 'Escape') {
         isPongActive = false; pongCanvas.style.display = 'none'; document.getElementById('pong-msg').style.display = 'none';
         document.getElementById('virtual-pad').style.display = 'none';
@@ -656,15 +795,82 @@
         typeLine(i18n[currLang].scripts.pongExit);
       }
     });
+    window.addEventListener('keyup', (e) => {
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) keysMap[e.code] = false;
+    });
 
-    // 모바일 터치 이벤트 바인딩
+    // --- 캔버스 마우스/터치 드래그 이벤트 (에어하키 전용 직접 끌기) ---
+    function getPointerPos(e) {
+      const rect = pongCanvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      // 화면 픽셀을 캔버스 논리 픽셀(320x144)로 변환
+      return {
+        x: (clientX - rect.left) / (rect.width / pWidth),
+        y: (clientY - rect.top) / (rect.height / pHeight)
+      };
+    }
+
+    function handlePointerDown(e) {
+      if (currentGameType !== 'HOCKEY' || !isPongActive) return;
+      if (state === 'WAIT') {
+        state = 'PLAY'; document.getElementById('pong-msg').style.display = 'none';
+        ballDX = Math.random() > 0.5 ? 1 : -1; ballDY = (Math.random() - 0.5) * 2;
+        return;
+      }
+
+      const pos = getPointerPos(e);
+      // 포인터가 내 말 반경 안쪽을 클릭/터치했는지
+      const dx = pos.x - hPlayerX;
+      const dy = pos.y - hPlayerY;
+      if (Math.hypot(dx, dy) < hRadius + 15) { // 모바일을 위해 판정 반경 넉넉히
+        isDragging = true;
+        dragOffsetX = dx;
+        dragOffsetY = dy;
+      }
+    }
+
+    function handlePointerMove(e) {
+      if (!isDragging || currentGameType !== 'HOCKEY' || !isPongActive) return;
+      e.preventDefault(); // 스크롤(모바일) 방지
+      const pos = getPointerPos(e);
+      let nx = pos.x - dragOffsetX;
+      let ny = pos.y - dragOffsetY;
+
+      // 이동 반경 제한 적용 (내 진영으로)
+      if (nx - hRadius < 4) nx = hRadius + 4;
+      if (nx + hRadius > pWidth / 2 - 2) nx = pWidth / 2 - 2 - hRadius;
+      if (ny - hRadius < 4) ny = hRadius + 4;
+      if (ny + hRadius > pHeight - 4) ny = pHeight - 4 - hRadius;
+
+      hPlayerX = nx;
+      hPlayerY = ny;
+    }
+
+    function handlePointerUp(e) {
+      isDragging = false;
+    }
+
+    pongCanvas.addEventListener('mousedown', handlePointerDown);
+    pongCanvas.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
+    pongCanvas.addEventListener('touchstart', handlePointerDown, { passive: false });
+    pongCanvas.addEventListener('touchmove', handlePointerMove, { passive: false });
+    window.addEventListener('touchend', handlePointerUp);
+
+
+    // 모바일 터치 이벤트 바인딩 (핑퐁 전용)
     function vPress(key) {
       if (!isPongActive) return;
       if (state === 'WAIT' && key === 'Space') {
         state = 'PLAY'; document.getElementById('pong-msg').style.display = 'none';
         ballDX = Math.random() > 0.5 ? 1 : -1; ballDY = (Math.random() - 0.5) * 2;
+        if (currentGameType === 'PONG') ballDY = (Math.random() - 0.5) * 1.5;
       }
-      if (key === 'ArrowUp') playerY -= 20; if (key === 'ArrowDown') playerY += 20;
+
+      if (currentGameType === 'PONG') {
+        if (key === 'ArrowUp') playerY -= 20; if (key === 'ArrowDown') playerY += 20;
+      }
       if (key === 'q') {
         isPongActive = false; pongCanvas.style.display = 'none'; document.getElementById('pong-msg').style.display = 'none';
         document.getElementById('virtual-pad').style.display = 'none';
@@ -672,10 +878,14 @@
         typeLine(i18n[currLang].scripts.pongExit);
       }
     }
-    document.getElementById('v-up').addEventListener('touchstart', (e) => { e.preventDefault(); vPress('ArrowUp'); });
-    document.getElementById('v-down').addEventListener('touchstart', (e) => { e.preventDefault(); vPress('ArrowDown'); });
+
+    const btnUp = document.getElementById('v-up');
+    const btnDown = document.getElementById('v-down');
+    if (btnUp) btnUp.addEventListener('touchstart', (e) => { e.preventDefault(); vPress('ArrowUp'); });
+    if (btnDown) btnDown.addEventListener('touchstart', (e) => { e.preventDefault(); vPress('ArrowDown'); });
     document.getElementById('v-space').addEventListener('touchstart', (e) => { e.preventDefault(); vPress('Space'); });
     document.getElementById('v-q').addEventListener('touchstart', (e) => { e.preventDefault(); vPress('q'); });
+
   </script>
 </body>
 
