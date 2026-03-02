@@ -2,7 +2,7 @@
 
 **An ordinary builder weaving code in the vector space.**
 
-<p align="center">
+<p align="left">
   <a href="https://redsunjin.github.io/.github/index.html">
     <img src="https://raw.githubusercontent.com/redsunjin/.github/main/profile/banner.svg" alt="Enter The Builder's Tale" width="400">
   </a>
