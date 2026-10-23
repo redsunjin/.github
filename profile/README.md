@@ -10,9 +10,12 @@
 
 ## 🔨 Construction Sites (Public)
 Here are the monoliths I'm currently laying bricks for:
-- **[maestro-coding](https://github.com/redsunjin/maestro-coding)** — 코딩을 지휘하다: AI 에이전트와 함께하는 코드 심포니 🎼
-- **[trunk_rag](https://github.com/redsunjin/trunk_rag)** — 폐쇄망/로컬 환경에서 사용하는 경량 RAG
-- **[OpenCourse-TTS-Helper](https://github.com/redsunjin/OpenCourse-TTS-Helper)** — 온라인 학습 플랫폼 스크립트를 음성으로 읽어주는 브라우저 확장
+- **[김콩](https://buddy-agent-k.github.io/)** — A small AI companion that remembers conversations and stays close
+- **[TRIP119](https://e3o-labs.github.io/trip119/)** — Travel planning that adapts when plans change
+- **[나란히 걸어봄](https://e3o-labs.github.io/pet-readiness/)** — Seven-day life practice before adopting a dog
+- **[consentguard_ai](https://github.com/redsunjin/consentguard_ai)** — Actionable AI agent for consent and terms risk
+- **[ane-context-ai](https://github.com/Lightning-Public/ane-context-ai)** — Provenance-first context packages for Ancient Near Eastern texts, artifacts, and debates
+- **[AquaGuard-AI](https://github.com/Lightning-Public/AquaGuard-AI)** — Open-source computer vision framework for water safety and child drowning prevention
 
 > **[ 🔍 View More Public Repositories ](https://github.com/redsunjin?tab=repositories)**
 
