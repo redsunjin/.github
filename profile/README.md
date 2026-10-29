@@ -12,7 +12,8 @@
 Here are the monoliths I'm currently laying bricks for:
 - **[김콩](https://buddy-agent-k.github.io/)** — A small AI companion that remembers conversations and stays close
 - **[TRIP119](https://e3o-labs.github.io/trip119/)** — Travel planning that adapts when plans change
-- **[나란히 걸어봄](https://e3o-labs.github.io/pet-readiness/)** — Seven-day life practice before adopting a dog
+- **[나란히 걸어봄](https://e3o-labs.github.io/pet-readiness/)** — Seven-day life practice before adopting a dog · [App Store](https://apps.apple.com/kr/app/나란히-걸어봄/id6808245716)
+- **[Lucky (럭키)](https://e3o-labs.github.io/lucky/)** — A personal journal for reflecting on the paths your choices create · [App Store](https://apps.apple.com/kr/app/lucky/id6808886591)
 - **[consentguard_ai](https://github.com/redsunjin/consentguard_ai)** — Actionable AI agent for consent and terms risk
 - **[ane-context-ai](https://github.com/Lightning-Public/ane-context-ai)** — Provenance-first context packages for Ancient Near Eastern texts, artifacts, and debates
 - **[AquaGuard-AI](https://github.com/Lightning-Public/AquaGuard-AI)** — Open-source computer vision framework for water safety and child drowning prevention
